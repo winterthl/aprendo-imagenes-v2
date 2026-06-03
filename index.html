@@ -309,20 +309,15 @@
     </main>
 </div>
 
-<!-- ========================================== -->
-<!-- 1. LIBRERÍA SUPABASE -->
-<!-- ========================================== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- ========================================== -->
-<!-- 2. LÓGICA DE LA APLICACIÓN -->
-<!-- ========================================== -->
 <script>
     // --- CONEXIÓN A SUPABASE ---
     const SUPABASE_URL = 'https://angvicpaatfpedlfjdvk.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuZ3ZpY3BhYXRmcGVkbGZqZHZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MzY0MTksImV4cCI6MjA5NjAxMjQxOX0.BPGcHFfMJp_zXmlCGNAO5kepjJn8Nlnm-G0MvlOkZc0';
     
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // EL CAMBIO ESTÁ AQUÍ: Le pusimos "supabaseClient" para no chocar con la librería
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // --- VARIABLES GLOBALES ---
     const defaultCategories = [
@@ -462,7 +457,7 @@
 
         const fakeEmail = user.toLowerCase() + '@app.com';
 
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await supabaseClient.auth.signUp({
             email: fakeEmail,
             password: pw
         });
@@ -488,7 +483,7 @@
 
         const fakeEmail = user.toLowerCase() + '@app.com';
 
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
             email: fakeEmail,
             password: pw
         });
@@ -511,7 +506,7 @@
     }
 
     async function doLogout() {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         isEditing = false;
         currentUserKey = "";
         document.getElementById('adminPanel').style.display = 'none';
