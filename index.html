@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🌈 ¡Aprendo con Imágenes!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{--bg-main:#1e1e1e;--bg-card:#2d2d2d;--bg-input:#333333;--border-color:#444444;--text-main:#ffffff;--text-muted:#aaaaaa;--font-family:'Nunito',sans-serif}
+        
+        body{
+            min-height:100vh;
+            background-color:var(--bg-main);
+            font-family:var(--font-family);
+            color:var(--text-main);
+            display:flex;
+            flex-direction:column;
+            overflow-x:hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* AUTH CONTAINER */
+        .auth-container{flex:1;display:flex;align-items:center;justify-content:center;padding:1rem}
+        .auth-card{background-color:var(--bg-card);border-radius:16px;padding:2rem 1.5rem;width:100%;max-width:400px;box-shadow:0 8px 24px rgba(0,0,0,0.3);border:1px solid #383838;text-align:center}
+        .auth-logo-icon{width:60px;height:60px;border-radius:16px;background:#ffd369;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px}
+        .auth-logo h2{font-size:22px;font-weight:800;margin-bottom:4px}
+        .auth-logo p{font-size:14px;color:var(--text-muted);margin-bottom:1.5rem}
+        .auth-tabs{display:flex;gap:10px;margin-bottom:1.5rem}
+        .auth-tab{flex:1;padding:12px;border:1px solid var(--border-color);border-radius:8px;font-family:var(--font-family);font-size:15px;font-weight:700;color:var(--text-main);background:transparent;cursor:pointer;transition:background 0.2s}
+        .auth-tab.active{background-color:#242424;border-color:#555555}
+        .auth-field{margin-bottom:1.25rem;text-align:left}
+        .auth-field label{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
+        .auth-input-wrap{position:relative;display:flex;align-items:center}
+        .auth-input-wrap .field-icon{position:absolute;left:14px;font-size:16px;color:var(--text-muted);pointer-events:none}
+        .auth-input-wrap input{width:100%;height:46px;padding:0 40px 0 45px;border:1px solid var(--border-color);border-radius:8px;font-family:var(--font-family);font-size:16px;color:var(--text-main);background-color:var(--bg-input);outline:none;border-radius: 8px !important; -webkit-appearance: none;}
+        .toggle-eye{position:absolute;right:8px;background:#242424;border:1px solid var(--border-color);border-radius:6px;cursor:pointer;padding:6px 10px;color:var(--text-main);display:flex;align-items:center;user-select:none; -webkit-user-select:none;}
+        .pw-bar{height:4px;background:#242424;margin-top:10px;border-radius:2px;overflow:hidden}
+        .pw-fill{height:100%;width:0%;transition:width 0.3s, background 0.3s}
+        .pw-hint{font-size:12px;color:var(--text-muted);margin-top:6px}
+        .auth-submit{width:100%;padding:14px;border-radius:8px;border:1px solid var(--border-color);cursor:pointer;font-family:var(--font-family);font-size:16px;font-weight:700;background-color:var(--bg-input);color:var(--text-main);margin-top:1.5rem;display:flex;align-items:center;justify-content:center;gap:8px; -webkit-appearance: none;}
+        .auth-switch{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:14px;color:var(--text-muted);margin-top:1.5rem}
+        .auth-switch button{background-color:var(--bg-input);border:1px solid var(--border-color);border-radius:8px;cursor:pointer;color:var(--text-main);font-weight:700;font-size:14px;padding:10px 20px;width:100%;max-width:200px; -webkit-appearance: none;}
+        .auth-msg{margin-top:1rem;padding:10px;border-radius:8px;font-size:13px;font-weight:700;display:none}
+        .auth-msg.success{background:#e1f5ee;color:#0f6e56;display:block}
+        .auth-msg.error{background:#fcebeb;color:#a32d2d;display:block}
+
+        /* MAIN APP WRAPPER */
+        .app-wrapper{display:none;flex-direction:column;width:100%;min-height:100vh;padding:12px}
+        header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--border-color);margin-bottom:15px}
+        .logo{display:flex;align-items:center;gap:10px;flex:1;min-width:200px}
+        .logo-text h1{font-size:20px;font-weight:800;color:#ffd369}
+        .logo-text p{font-size:12px;color:var(--text-muted)}
+        .header-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%;justify-content:space-between}
+        
+        @media(min-width: 600px) {
+            .app-wrapper { padding: 20px; }
+            header { padding-bottom: 20px; margin-bottom: 25px; gap: 16px; }
+            .logo-text h1 { font-size: 26px; }
+            .logo-text p { font-size: 14px; }
+            .header-controls { width: auto; justify-content: flex-end; gap: 12px; }
+        }
+
+        .user-badge{padding:8px 12px;border-radius:8px;background:#333;font-weight:700;font-size:13px;border:1px solid var(--border-color)}
+        .admin-btn{padding:8px 12px;border-radius:8px;background:#444;color:#fff;border:1px solid var(--border-color);cursor:pointer;font-weight:700;font-size:13px; -webkit-appearance: none;}
+        .admin-btn.active{background:#ffd369;color:#222;border-color:#ffd369}
+        .logout-btn{padding:8px 12px;border-radius:8px;background:#e24b4a;color:#fff;border:none;cursor:pointer;font-weight:700;font-size:13px; -webkit-appearance: none;}
+        
+        /* ADMIN PANEL INTERFACE */
+        .admin-panel{display:none;background:#262626;border:1px solid var(--border-color);border-radius:12px;padding:15px;margin-bottom:20px;box-shadow:inset 0 2px 8px rgba(0,0,0,0.2)}
+        .admin-grid{display:flex;flex-direction:column;gap:15px}
+        @media(min-width: 768px) {
+            .admin-grid { flex-direction: row; flex-wrap: wrap; }
+        }
+        .admin-box{flex:1;min-width:240px;background:#2d2d2d;padding:15px;border-radius:8px;border:1px solid #3d3d3d}
+        .admin-box h3{font-size:15px;font-weight:700;margin-bottom:12px;color:#ffd369;display:flex;align-items:center;gap:6px}
+        .admin-row{display:flex;gap:8px;margin-bottom:10px}
+        .admin-input{flex:1;background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-main);padding:10px 12px;border-radius:6px;font-family:var(--font-family);font-size:16px;outline:none; -webkit-appearance: none;}
+        .admin-submit{background:#ffd369;color:#222;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-size:14px;width:100%; -webkit-appearance: none;}
+        .admin-delete-cat{background:#e24b4a;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px;width:100%;margin-top:10px; -webkit-appearance: none;}
+
+        /* CONFIGURACIÓN DE VOZ */
+        .voice-settings-box{display:flex;flex-direction:column;gap:10px}
+        .voice-control-field{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
+        .voice-select{background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-color);padding:10px;border-radius:6px;font-family:var(--font-family);outline:none;cursor:pointer;width:100%;font-size:14px; -webkit-appearance: none;}
+        .speed-slider-container{display:flex;align-items:center;gap:10px}
+        .speed-slider{flex:1;cursor:pointer;accent-color:#ffd369;height:24px}
+
+        /* CATEGORÍAS */
+        .cat-bar{
+            display:flex;
+            gap:10px;
+            overflow-x:auto;
+            padding-bottom:12px;
+            margin-bottom:15px;
+            scrollbar-width:none; 
+            -webkit-overflow-scrolling: touch; 
+        }
+        .cat-bar::-webkit-scrollbar { display: none; } 
+        
+        .cat-pill{
+            display:flex;
+            align-items:center;
+            gap:6px;
+            padding:10px 16px;
+            border-radius:24px;
+            border:1px solid var(--border-color);
+            background:var(--bg-card);
+            color:var(--text-main);
+            font-weight:700;
+            cursor:pointer;
+            white-space:nowrap;
+            font-size:14px;
+            transition: transform 0.1s;
+            -webkit-appearance: none;
+        }
+        .cat-pill.active{background:#ffd369;color:#222;border-color:#ffd369;transform:scale(1.03)}
+        
+        /* GRILLA */
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(105px, 1fr)); 
+            gap:12px;
+            padding-bottom:40px;
+        }
+        @media(min-width: 400px) {
+            .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px; }
+        }
+        
+        .card-container{position:relative}
+        .card{
+            background:var(--bg-card);
+            border-radius:16px;
+            padding:15px 8px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            cursor:pointer;
+            border:1px solid var(--border-color);
+            user-select:none;
+            -webkit-user-select: none;
+            height:130px;
+            touch-action: manipulation; 
+        }
+        .card:active{transform:scale(0.96); background:#363636;} 
+        
+        .card-emoji{font-size:44px;line-height:1;display:flex;align-items:center;justify-content:center}
+        .card-img{width:60px;height:60px;object-fit:cover;border-radius:12px;border:1px solid #444}
+        .card-name{font-size:14px;font-weight:700;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        
+        .card-del-badge{
+            position:absolute;
+            top:-6px;
+            right:-6px;
+            background:#e24b4a;
+            color:white;
+            border-radius:50%;
+            width:28px; 
+            height:28px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:12px;
+            cursor:pointer;
+            border:2px solid var(--bg-main);
+            box-shadow:0 2px 6px rgba(0,0,0,0.3);
+            z-index:10;
+            font-weight:bold;
+            -webkit-appearance: none;
+        }
+        .section-title{font-size:18px;font-weight:800;margin-bottom:12px;color:#ffd369}
+        @media(min-width:600px){
+            .section-title { font-size:22px; margin-bottom:16px; }
+            .card { height:140px; padding:20px 12px; }
+            .card-emoji { font-size:50px; }
+            .card-img { width:65px; height:65px; }
+            .card-name { font-size:15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-container" id="authContainer">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="auth-logo-icon">🌈</div>
+            <h2>¡Aprendo con Imágenes!</h2>
+            <p id="authSub">Crea tu cuenta para empezar</p>
+        </div>
+        
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="tabReg" onclick="switchTab('reg')">Registrarse</button>
+            <button class="auth-tab" id="tabLog" onclick="switchTab('log')">Entrar</button>
+        </div>
+
+        <div id="panelReg">
+            <div class="auth-field">
+                <label>Usuario</label>
+                <div class="auth-input-wrap">
+                    <span class="field-icon">👤</span>
+                    <input type="text" id="regUser" placeholder="Elige tu usuario" oninput="clearMsg()">
+                </div>
+            </div>
+            <div class="auth-field">
+                <label>Contraseña</label>
+                <div class="auth-input-wrap">
+                    <span class="field-icon">🔒</span>
+                    <input type="password" id="regPw" placeholder="Mínimo 6 caracteres" oninput="checkStrength()">
+                    <button class="toggle-eye" onclick="togglePw('regPw', this)">👁️</button>
+                </div>
+                <div class="pw-bar"><div class="pw-fill" id="pwFill"></div></div>
+                <div class="pw-hint" id="pwHint">Escribe para ver la fortaleza</div>
+            </div>
+            <div class="auth-msg" id="msgReg"></div>
+            <button class="auth-submit" onclick="doRegister()">⭐ ¡Crear cuenta!</button>
+            <div class="auth-switch"><span>¿Ya tienes cuenta?</span><button onclick="switchTab('log')">Entrar aquí</button></div>
+        </div>
+
+        <div id="panelLog" style="display:none;">
+            <div class="auth-field">
+                <label>Usuario</label>
+                <div class="auth-input-wrap">
+                    <span class="field-icon">👤</span>
+                    <input type="text" id="logUser" placeholder="Tu nombre de usuario" oninput="clearMsg()">
+                </div>
+            </div>
+            <div class="auth-field">
+                <label>Contraseña</label>
+                <div class="auth-input-wrap">
+                    <span class="field-icon">🔒</span>
+                    <input type="password" id="logPw" placeholder="Tu contraseña" oninput="clearMsg()">
+                    <button class="toggle-eye" onclick="togglePw('logPw', this)">👁️</button>
+                </div>
+            </div>
+            <div class="auth-msg" id="msgLog"></div>
+            <button class="auth-submit" onclick="doLogin()">➡️ Entrar</button>
+            <div class="auth-switch"><span>¿No tienes cuenta?</span><button onclick="switchTab('reg')">Regístrate</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="app-wrapper" id="appWrapper">
+    <header>
+        <div class="logo">
+            <div class="auth-logo-icon" style="width:40px;height:40px;font-size:22px;margin:0;border-radius:10px;">🌈</div>
+            <div class="logo-text">
+                <h1>¡Aprendo con Imágenes!</h1>
+                <p>Toca cada imagen para escuchar su nombre</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <div class="user-badge" id="userBadge">👤 Usuario</div>
+            <button class="admin-btn" id="adminToggleBtn" onclick="toggleAdminPanel()">⚙️ Modificar</button>
+            <button class="logout-btn" onclick="doLogout()">🚪 Salir</button>
+        </div>
+    </header>
+
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-grid">
+            <div class="admin-box">
+                <h3>📂 Gestionar Categorías</h3>
+                <div class="admin-row">
+                    <input type="text" id="newCatIcon" class="admin-input" placeholder="Icono (ej: 🍽️)">
+                    <input type="text" id="newCatLabel" class="admin-input" placeholder="Nombre (ej: Comida)">
+                </div>
+                <button class="admin-submit" onclick="addCategory()">➕ Añadir Categoría</button>
+                <button class="admin-delete-cat" onclick="deleteCurrentCategory()">🗑️ Eliminar Categoría Actual</button>
+            </div>
+            <div class="admin-box">
+                <h3>🖼️ Añadir Tarjeta</h3>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" id="newItemName" class="admin-input" placeholder="Nombre / Texto (ej: Bistec)">
+                    <div style="display:flex; flex-direction:column; gap:8px; background:#242424; padding:8px; border-radius:6px; border:1px solid var(--border-color)">
+                        <input type="text" id="newItemEmoji" class="admin-input" placeholder="Opción A: Escribe un Emoji">
+                        <span style="font-size:12px; color:var(--text-muted); text-align:center;">- ó bien -</span>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <span style="font-size:12px; color:var(--text-muted)">Opción B: Elegir foto del carrete:</span>
+                            <input type="file" id="newItemFile" class="admin-input" accept="image/*" style="padding:5px; font-size:12px; background:var(--bg-main)">
+                        </div>
+                    </div>
+                    <button class="admin-submit" onclick="addItem()">➕ Guardar Tarjeta</button>
+                </div>
+            </div>
+            <div class="admin-box">
+                <h3>🗣️ Configuración de Voz</h3>
+                <div class="voice-settings-box">
+                    <div class="voice-control-field">
+                        <label>Elegir Voz:</label>
+                        <select id="voiceSelect" class="voice-select" onchange="saveUserVoicePreferences()"></select>
+                    </div>
+                    <div class="voice-control-field">
+                        <label>Velocidad:</label>
+                        <div class="speed-slider-container">
+                            <input type="range" id="voiceSpeed" class="speed-slider" min="0.5" max="1.5" step="0.1" value="0.8" onchange="saveUserVoicePreferences()">
+                            <span id="speedValue" style="color:#ffd369; min-width:35px; font-weight:bold;">0.8x</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="cat-bar" id="catBar"></nav>
+    <main>
+        <div class="section-title" id="sectionTitle"></div>
+        <div class="grid" id="grid"></div>
+    </main>
+</div>
+
+<!-- ========================================== -->
+<!-- 1. LIBRERÍA SUPABASE -->
+<!-- ========================================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- ========================================== -->
+<!-- 2. LÓGICA DE LA APLICACIÓN -->
+<!-- ========================================== -->
+<script>
+    // --- CONEXIÓN A SUPABASE ---
+    const SUPABASE_URL = 'https://angvicpaatfpedlfjdvk.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuZ3ZpY3BhYXRmcGVkbGZqZHZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MzY0MTksImV4cCI6MjA5NjAxMjQxOX0.BPGcHFfMJp_zXmlCGNAO5kepjJn8Nlnm-G0MvlOkZc0';
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // --- VARIABLES GLOBALES ---
+    const defaultCategories = [
+        {id:"animales",label:"Animales",icon:"🐾",items:[{emoji:"🐶",name:"Perro"},{emoji:"🐱",name:"Gato"},{emoji:"🐮",name:"Vaca"}]},
+        {id:"frutas",label:"Frutas",icon:"🍎",items:[{emoji:"🍎",name:"Manzana"},{emoji:"🍌",name:"Plátano"}]},
+        {id:"comida",label:"Comida",icon:"🍽️",items:[{emoji:"🍕",name:"Pizza"},{emoji:"🍔",name:"Hamburguesa"}]}
+    ];
+
+    let categories = JSON.parse(localStorage.getItem('app_categories')) || defaultCategories;
+    let currentCat = categories[0] ? categories[0].id : "";
+    let isEditing = false;
+    let availableVoices = [];
+    let currentUserKey = "";
+
+    function saveCategories() {
+        localStorage.setItem('app_categories', JSON.stringify(categories));
+    }
+
+    // --- FUNCIONES DE VOZ ---
+    function loadVoices() {
+        if (typeof speechSynthesis === 'undefined') return;
+        
+        availableVoices = speechSynthesis.getVoices();
+        const voiceSelect = document.getElementById('voiceSelect');
+        if (!voiceSelect) return;
+        
+        voiceSelect.innerHTML = '';
+        const spanishVoices = availableVoices.filter(voice => voice.lang.toLowerCase().startsWith('es'));
+
+        if(spanishVoices.length === 0) {
+            const opt = document.createElement('option');
+            opt.textContent = "Voz nativa de Apple / Sistema";
+            opt.value = "default";
+            voiceSelect.appendChild(opt);
+        } else {
+            spanishVoices.forEach((voice) => {
+                const opt = document.createElement('option');
+                opt.value = voice.name;
+                opt.textContent = `${voice.name} (${voice.lang})`;
+                voiceSelect.appendChild(opt);
+            });
+        }
+        applyUserVoicePreferences();
+    }
+
+    if (typeof speechSynthesis !== 'undefined') {
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+        setTimeout(loadVoices, 200);
+    }
+
+    function saveUserVoicePreferences() {
+        if (!currentUserKey) return;
+        const selectedVoiceName = document.getElementById('voiceSelect').value;
+        const selectedSpeed = document.getElementById('voiceSpeed').value;
+        document.getElementById('speedValue').textContent = `${selectedSpeed}x`;
+        const prefs = { voice: selectedVoiceName, speed: selectedSpeed };
+        localStorage.setItem(`voice_prefs_${currentUserKey}`, JSON.stringify(prefs));
+    }
+
+    function applyUserVoicePreferences() {
+        if (!currentUserKey) return;
+        const savedPrefs = JSON.parse(localStorage.getItem(`voice_prefs_${currentUserKey}`));
+        if (savedPrefs) {
+            if (savedPrefs.voice) {
+                const voiceSelect = document.getElementById('voiceSelect');
+                if(voiceSelect.querySelector(`option[value="${savedPrefs.voice}"]`)) {
+                    voiceSelect.value = savedPrefs.voice;
+                }
+            }
+            if (savedPrefs.speed) {
+                document.getElementById('voiceSpeed').value = savedPrefs.speed;
+                document.getElementById('speedValue').textContent = `${savedPrefs.speed}x`;
+            }
+        } else {
+            document.getElementById('voiceSpeed').value = "0.8";
+            document.getElementById('speedValue').textContent = "0.8x";
+        }
+    }
+
+    // --- FUNCIONES DE INTERFAZ ---
+    function switchTab(tab) {
+        const isReg = tab === 'reg';
+        document.getElementById('panelReg').style.display = isReg ? 'block' : 'none';
+        document.getElementById('panelLog').style.display = isReg ? 'none' : 'block';
+        document.getElementById('tabReg').classList.toggle('active', isReg);
+        document.getElementById('tabLog').classList.toggle('active', !isReg);
+        document.getElementById('authSub').textContent = isReg ? "Crea tu cuenta para empezar" : "Bienvenido de vuelta 👋";
+        clearMsg();
+    }
+
+    function togglePw(id, btn) {
+        const input = document.getElementById(id);
+        const isPw = input.type === 'password';
+        input.type = isPw ? 'text' : 'password';
+        btn.textContent = isPw ? '🙈' : '👁️';
+    }
+
+    function checkStrength() {
+        const pw = document.getElementById('regPw').value;
+        const fill = document.getElementById('pwFill');
+        const hint = document.getElementById('pwHint');
+        let score = 0;
+        if (pw.length >= 6) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^a-zA-Z0-9]/.test(pw)) score++;
+
+        if (pw.length === 0) {
+            fill.style.width = '0%';
+            hint.textContent = 'Escribe para ver la fortaleza';
+        } else {
+            const levels = [{w:'35%',bg:'#e24b4a',t:'Débil'},{w:'70%',bg:'#ef9f27',t:'Regular'},{w:'100%',bg:'#1d9e75',t:'¡Excelente! 🎉'}];
+            const lvl = levels[Math.min(score, 2)];
+            fill.style.width = lvl.w; fill.style.background = lvl.bg; hint.textContent = lvl.t; hint.style.color = lvl.bg;
+        }
+    }
+
+    function clearMsg() {
+        document.querySelectorAll('.auth-msg').forEach(el => el.style.display = 'none');
+    }
+
+    // --- INTEGRACIÓN SUPABASE: REGISTRO Y LOGIN ---
+    async function doRegister() {
+        const user = document.getElementById('regUser').value.trim();
+        const pw = document.getElementById('regPw').value;
+        const msg = document.getElementById('msgReg');
+
+        if (!user || pw.length < 6) { 
+            msg.className = 'auth-msg error'; 
+            msg.textContent = '✖ Datos inválidos o contraseña corta.'; 
+            return; 
+        }
+
+        msg.className = 'auth-msg success';
+        msg.textContent = '⏳ Creando cuenta en Supabase...';
+
+        const fakeEmail = user.toLowerCase() + '@app.com';
+
+        const { data, error } = await supabase.auth.signUp({
+            email: fakeEmail,
+            password: pw
+        });
+
+        if (error) {
+            msg.className = 'auth-msg error'; 
+            msg.textContent = '✖ Error: ' + error.message;
+            return;
+        }
+
+        msg.className = 'auth-msg success'; 
+        msg.textContent = '✔ ¡Cuenta creada! Redirigiendo...';
+        setTimeout(() => { switchTab('log'); }, 1000);
+    }
+
+    async function doLogin() {
+        const user = document.getElementById('logUser').value.trim();
+        const pw = document.getElementById('logPw').value;
+        const msg = document.getElementById('msgLog');
+
+        msg.className = 'auth-msg success';
+        msg.textContent = '⏳ Verificando credenciales...';
+
+        const fakeEmail = user.toLowerCase() + '@app.com';
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: fakeEmail,
+            password: pw
+        });
+
+        if (error) { 
+            msg.className = 'auth-msg error'; 
+            msg.textContent = '✖ Usuario o contraseña incorrectos.'; 
+            return; 
+        }
+
+        currentUserKey = user.toLowerCase();
+        document.getElementById('userBadge').textContent = `👤 ${user}`;
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('appWrapper').style.display = 'flex';
+        
+        loadVoices();
+        if(categories.length > 0 && currentCat === "") { currentCat = categories[0].id; }
+        renderCats();
+        renderGrid();
+    }
+
+    async function doLogout() {
+        await supabase.auth.signOut();
+        isEditing = false;
+        currentUserKey = "";
+        document.getElementById('adminPanel').style.display = 'none';
+        document.getElementById('adminToggleBtn').classList.remove('active');
+        document.getElementById('authContainer').style.display = 'flex';
+        document.getElementById('appWrapper').style.display = 'none';
+        switchTab('log');
+    }
+
+    // --- FUNCIONES DEL PANEL ADMIN ---
+    function toggleAdminPanel() {
+        isEditing = !isEditing;
+        const panel = document.getElementById('adminPanel');
+        const btn = document.getElementById('adminToggleBtn');
+        panel.style.display = isEditing ? 'block' : 'none';
+        btn.classList.toggle('active', isEditing);
+        renderGrid();
+    }
+
+    function addCategory() {
+        const label = document.getElementById('newCatLabel').value.trim();
+        const icon = document.getElementById('newCatIcon').value.trim();
+        if(!label || !icon) return;
+
+        const id = label.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_');
+        if(categories.some(c => c.id === id)) { alert("Esta categoría ya existe."); return; }
+
+        categories.push({ id: id, label: label, icon: icon, items: [] });
+        saveCategories();
+        currentCat = id;
+        
+        document.getElementById('newCatLabel').value = '';
+        document.getElementById('newCatIcon').value = '';
+        renderCats();
+        renderGrid();
+    }
+
+    function deleteCurrentCategory() {
+        if(categories.length === 0) return;
+        if(!confirm("¿Seguro que quieres eliminar por completo esta categoría?")) return;
+
+        categories = categories.filter(c => c.id !== currentCat);
+        saveCategories();
+        currentCat = categories.length > 0 ? categories[0].id : "";
+        renderCats();
+        renderGrid();
+    }
+
+    function addItem() {
+        const name = document.getElementById('newItemName').value.trim();
+        const emoji = document.getElementById('newItemEmoji').value.trim();
+        const fileInput = document.getElementById('newItemFile');
+        
+        if(!name) { alert("Escribe un nombre para la tarjeta."); return; }
+        if(categories.length === 0) { alert("Crea una categoría primero."); return; }
+
+        const cat = categories.find(c => c.id === currentCat);
+        if(!cat) return;
+
+        if (fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxSize = 200;
+
+                    if (width > height) {
+                        if (width > maxSize) { height *= maxSize / width; width = maxSize; }
+                    } else {
+                        if (height > maxSize) { width *= maxSize / height; height = maxSize; }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const base64Mini = canvas.toDataURL('image/jpeg', 0.7);
+
+                    cat.items.push({ emoji: base64Mini, name: name, isCustomImage: true });
+                    saveCategories();
+                    resetInputs();
+                    renderGrid();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else if(emoji) {
+            cat.items.push({ emoji: emoji, name: name, isCustomImage: false });
+            saveCategories();
+            resetInputs();
+            renderGrid();
+        } else {
+            alert("Por favor inserta un emoji o selecciona una foto.");
+        }
+    }
+
+    function resetInputs() {
+        document.getElementById('newItemName').value = '';
+        document.getElementById('newItemEmoji').value = '';
+        document.getElementById('newItemFile').value = '';
+    }
+
+    function deleteItem(index) {
+        const cat = categories.find(c => c.id === currentCat);
+        if(cat) {
+            cat.items.splice(index, 1);
+            saveCategories();
+            renderGrid();
+        }
+    }
+
+    function renderCats() {
+        const bar = document.getElementById('catBar');
+        bar.innerHTML = '';
+        if(categories.length === 0) {
+            document.getElementById('sectionTitle').textContent = "No hay categorías";
+            return;
+        }
+        categories.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = `cat-pill ${c.id === currentCat ? 'active' : ''}`;
+            btn.innerHTML = `<span>${c.icon}</span> ${c.label}`;
+            btn.onclick = () => { currentCat = c.id; renderCats(); renderGrid(); };
+            bar.appendChild(btn);
+        });
+    }
+
+    function renderGrid() {
+        const grid = document.getElementById('grid');
+        const title = document.getElementById('sectionTitle');
+        grid.innerHTML = '';
+        
+        if(categories.length === 0 || currentCat === "") {
+            grid.innerHTML = '<p style="color:var(--text-muted)">Usa el panel de herramientas de arriba para empezar a crear contenido.</p>';
+            title.textContent = "";
+            return;
+        }
+
+        const cat = categories.find(c => c.id === currentCat);
+        title.textContent = `${cat.icon} ${cat.label}`;
+
+        cat.items.forEach((item, index) => {
+            const container = document.createElement('div');
+            container.className = 'card-container';
+
+            let delBadge = '';
+            if(isEditing) {
+                delBadge = `<span class="card-del-badge" onclick="event.stopPropagation(); deleteItem(${index})">❌</span>`;
+            }
+
+            const visualContent = (item.isCustomImage || item.emoji.startsWith('data:image'))
+                ? `<img src="${item.emoji}" class="card-img" alt="${item.name}">`
+                : `<div class="card-emoji">${item.emoji}</div>`;
+
+            container.innerHTML = `
+                ${delBadge}
+                <div class="card" onclick="speak('${item.name}')">
+                    ${visualContent}
+                    <div class="card-name">${item.name}</div>
+                </div>
+            `;
+            grid.appendChild(container);
+        });
+    }
+
+    function speak(text) {
+        if (typeof speechSynthesis === 'undefined') return;
+        
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voiceSelect = document.getElementById('voiceSelect');
+        const voiceSpeed = document.getElementById('voiceSpeed');
+        
+        if (voiceSelect && voiceSpeed) {
+            const selectedVoiceName = voiceSelect.value;
+            const selectedSpeed = parseFloat(voiceSpeed.value);
+            
+            const matchingVoice = availableVoices.find(v => v.name === selectedVoiceName);
+            if (matchingVoice) {
+                utterance.voice = matchingVoice;
+            } else {
+                utterance.lang = 'es-ES';
+            }
+            utterance.rate = isNaN(selectedSpeed) ? 0.8 : selectedSpeed;
+        } else {
+            utterance.lang = 'es-ES';
+            utterance.rate = 0.8;
+        }
+        
+        window.speechSynthesis.speak(utterance);
+    }
+</script>
+</body>
+</html>
